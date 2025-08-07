@@ -1,10 +1,12 @@
 import pygame, sys
 from settings import *
+from scripts.debug import *
 
 class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption('The Royal Ranger')
         self.clock = pygame.time.Clock()
         
     def run(self):
@@ -15,6 +17,7 @@ class Game:
                     sys.exit()
                     
             self.screen.fill('black')
+            debug('hello')
             pygame.display.update()
             self.clock.tick(FPS)
         
