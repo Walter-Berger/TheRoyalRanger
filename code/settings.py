@@ -1,22 +1,8 @@
 # screen settings
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 640
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 800
 TILESIZE = 64
 FPS = 60
 
-MAP = [
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    []
-]
+# images
+PLAYER_IMAGE_IDLE_DOWN = 'graphics/player/down/0.png'
