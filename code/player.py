@@ -3,38 +3,38 @@ from settings import *
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups):
-        # setup
         super().__init__(groups)
+        # setup
         self.image = pygame.image.load('graphics/player/down/0.png').convert_alpha()
         self.rect = self.image.get_rect(topleft = pos)
 
-        # movement
+        # movement settings
         self.direction = pygame.Vector2()
         self.speed = 500
-        self.dash_speed = self.speed * 3
-        self.dash_cooldown = -1.0
-        self.dash_duration = 0.2
-        self.dash_timer = 0
+
+        # blink settings
+        self.blink_distance = 150
+        self.blink_cooldown = 1000
+        self.blink_cooldown_end = 0
 
     def input(self):
         keys = pygame.key.get_pressed()      
         # movement input
         self.direction.x = keys[pygame.K_d] - keys[pygame.K_a]
         self.direction.y = keys[pygame.K_s] - keys[pygame.K_w]
-
-        # dash input
-        if keys[pygame.K_SPACE] and self.dash_timer <= self.dash_cooldown:
-            self.dash_timer = self.dash_duration
+     
+        # blink input, only if player is moving
+        if self.direction:
+            now = pygame.time.get_ticks()
+            if keys[pygame.K_SPACE] and now >= self.blink_cooldown_end:
+                blink_vector = self.direction * self.blink_distance
+                self.rect.topleft += blink_vector
+                self.blink_cooldown_end = (now + self.blink_cooldown)
             
     def move(self, dt):
-        # diagonal vector need to be normalized, otherwise player would move faster
-        if self.direction.magnitude() != 0:
+        if self.direction.length_squared() != 0:
             self.direction = self.direction.normalize()
-        
-        # determine current speed
-        current_speed = self.dash_speed if self.dash_timer > 0 else self.speed
-        self.rect.topleft += self.direction * current_speed * dt
-        self.dash_timer -= dt
+        self.rect.topleft += self.direction * self.speed * dt
 
     def update(self, dt):
         self.input()

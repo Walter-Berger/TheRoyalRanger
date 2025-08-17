@@ -28,14 +28,14 @@ class Game:
                     pygame.quit()
                     sys.exit()
 
-            # update     
+            # update
             self.all_sprites.update(dt)
 
             # draw
             self.display_surface.fill('black')
             self.all_sprites.draw(self.display_surface)
             pygame.display.update()
-        
+            
 
 if __name__ == '__main__':
     game = Game()
