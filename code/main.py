@@ -1,6 +1,6 @@
 import pygame, sys
 from settings import *
-from scripts.debug import *
+from debug import *
 
 class Game:
     def __init__(self):
@@ -17,7 +17,6 @@ class Game:
                     sys.exit()
                     
             self.screen.fill('black')
-            debug('hello')
             pygame.display.update()
             self.clock.tick(FPS)
         
