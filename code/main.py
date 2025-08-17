@@ -16,7 +16,7 @@ class Game:
 
         # sprites
         self.player = Player((100,100), self.all_sprites)
-      
+    
     def run(self):
         while True:  
             # get delta time in ms
@@ -35,7 +35,7 @@ class Game:
             self.display_surface.fill('black')
             self.all_sprites.draw(self.display_surface)
             pygame.display.update()
-            
+
 
 if __name__ == '__main__':
     game = Game()
