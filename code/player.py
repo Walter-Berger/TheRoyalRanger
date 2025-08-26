@@ -8,7 +8,6 @@ class Player(pygame.sprite.Sprite):
         # setup
         self.sprite_sheet = pygame.image.load("graphics/player/green.png").convert_alpha()
         self.animations = self.load_animations()  
-        #self.animations = self.load_animations()
         self.status = 'down'
         self.frame_index = 0
         self.animation_speed = 10
@@ -22,10 +21,10 @@ class Player(pygame.sprite.Sprite):
         self.speed = self.speed_walking
         self.running = False
 
-        # blink
-        self.blink_distance = 150
-        self.blink_cooldown = 8000
-        self.blink_cooldown_end = 0
+        # dash 
+        self.dash_cooldown = 4000
+        self.dash_time = 0
+        self.dashing = False
 
     def load_animations(self):
         COLS, ROWS = 12, 8
@@ -106,26 +105,24 @@ class Player(pygame.sprite.Sprite):
 
         # blink input, only if player is moving
         if self.direction:
-            now = pygame.time.get_ticks()
-            if keys[pygame.K_SPACE] and now >= self.blink_cooldown_end:
-                blink_vector = self.direction * self.blink_distance
+            if keys[pygame.K_SPACE] and not self.dashing:
+                self.dash_time = pygame.time.get_ticks()
+                self.dashing = True
+                blink_vector = self.direction * 150
                 self.rect.topleft += blink_vector
-                self.blink_cooldown_end = (now + self.blink_cooldown)
        
     def move(self, dt):
         self.rect.x += self.direction.x * self.speed * dt
         self.rect.y += self.direction.y * self.speed * dt
 
-    def draw_blink_cooldown(self):
-        now = pygame.time.get_ticks()
-        remaining = max(0, (self.blink_cooldown_end - now) / 1000)  # seconds
-        if remaining > 0:
-            debug(f"Blink CD: {remaining:.1f}s")
-        else:
-            debug("Blink Ready!")
+    def cooldown(self):
+        current_time = pygame.time.get_ticks()
+        if current_time - self.dash_time >= self.dash_cooldown:
+            self.dashing = False
 
     def update(self, dt):
         self.input()
+        self.cooldown()
         self.get_status()
         self.move(dt)
         self.animate(dt)
