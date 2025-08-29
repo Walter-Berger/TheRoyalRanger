@@ -47,52 +47,41 @@ class Player(pygame.sprite.Sprite):
             "up_left", "up_right", "down_left", "down_right"
         ]     
 
-        # Build full animation dictionary dynamically
+        # build full animation dictionary dynamically
         self.animations = {
             f"{direction}{variant}": []
             for direction in base_directions
             for variant in variants
         }
 
-        # Import animations from folders
+        # import animations from folders
         for animation in self.animations.keys():
             full_path = f"{player_path}{animation}"
             self.animations[animation] = self.import_folder(full_path) 
 
     def get_state(self):
-        # idle
-        if self.direction.x == 0 and self.direction.y == 0:
-            if 'sprint' in self.state:
-                self.state = self.state.replace('_sprint', '_idle')
-            elif 'idle' not in self.state:
-                self.state = self.state + '_idle'
+        # idle case
+        if self.direction.length_squared() == 0:
+            base = self.state.split('_')[0]
+            parts = self.state.split('_')
+            if len(parts) >= 2 and parts[1] in ("left", "right"):  
+                base = "_".join(parts[:2]) 
+            
+            self.state = f"{base}_idle"
             return
-        
-        # diagonal handling
-        if self.direction.y < 0 and self.direction.x < 0:       
-            self.state = 'up_left'
-        elif self.direction.y < 0 and self.direction.x > 0:
-            self.state = 'up_right'
-        elif self.direction.y > 0 and self.direction.x < 0:
-            self.state = 'down_left'
-        elif self.direction.y > 0 and self.direction.x > 0:
-            self.state = 'down_right'
-        # cardinal handling
-        elif self.direction.y < 0 and self.direction.x == 0:
-            self.state = 'up'
-        elif self.direction.y > 0 and self.direction.x == 0:
-            self.state = 'down'
-        elif self.direction.x < 0 and self.direction.y == 0:
-            self.state = 'left'
-        elif self.direction.x > 0 and self.direction.y == 0:
-            self.state = 'right'
 
-        # sprint logic
-        if self.running:
-            if 'idle' in self.state:
-                self.state = self.state.replace('_idle', '_sprint')
-            elif 'sprint' not in self.state:
-                self.state = self.state + '_sprint'
+        vertical = ""
+        horizontal = ""
+        if self.direction.y < 0:    vertical = "up"
+        elif self.direction.y > 0:  vertical = "down"
+        if self.direction.x < 0:    horizontal = "left"
+        elif self.direction.x > 0:  horizontal = "right"
+
+        # combine into base direction (e.g. "up_left", "down", "right")
+        base = "_".join([dir for dir in (vertical, horizontal) if dir]) or "down"
+
+        # apply sprint if running
+        self.state = f"{base}_sprint" if self.running else base
 
     def animate(self, dt):
         animation_speed = self.animation_speed * 1.5 if self.running else self.animation_speed
