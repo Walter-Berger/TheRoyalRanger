@@ -1,6 +1,6 @@
 import pygame
-from os import walk
 from settings import *
+from support import *
 from debug import *
 
 class Player(pygame.sprite.Sprite):
@@ -28,16 +28,6 @@ class Player(pygame.sprite.Sprite):
         self.dash_time = 0
         self.dashing = False
 
-    def import_folder(self, path):
-        surface_list = []
-        for _, __, img_files in walk(path):
-            for img in img_files:
-                full_path = path + '/' + img
-                image_surf = pygame.image.load(full_path).convert_alpha()
-                surface_list.append(image_surf)
-
-        return surface_list
-
     def import_player_assets(self):
         player_path = "graphics/player/"
 
@@ -57,7 +47,7 @@ class Player(pygame.sprite.Sprite):
         # import animations from folders
         for animation in self.animations.keys():
             full_path = f"{player_path}{animation}"
-            self.animations[animation] = self.import_folder(full_path) 
+            self.animations[animation] = import_folder(full_path) 
 
     def get_state(self):
         # idle case
