@@ -4,11 +4,13 @@ from support import *
 from debug import *
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups):
+    def __init__(self, pos, groups, collision_sprites):
         super().__init__(groups)
         # setup
         self.image = pygame.image.load("graphics/player/down_idle/0.png").convert_alpha()
         self.rect = self.image.get_rect(center = pos)
+        self.hitbox = self.rect.inflate(-self.rect.width / 2, -60)
+        self.collision_sprites = collision_sprites
 
         # graphics setup
         self.import_player_assets()
@@ -96,10 +98,31 @@ class Player(pygame.sprite.Sprite):
                 self.dashing = True
                 blink_vector = self.direction * 150
                 self.rect.topleft += blink_vector
-       
+
+    def collisions(self, axis):
+        for sprite in self.collision_sprites:
+            if sprite.hitbox.colliderect(self.hitbox):
+                if axis == 'horizontal':
+                    if self.direction.x > 0: 
+                        self.hitbox.right = sprite.hitbox.left
+                    if self.direction.x < 0:
+                        self.hitbox.left = sprite.hitbox.right
+                    self.rect.centerx = self.hitbox.centerx
+                else:
+                    if self.direction.y > 0:
+                        self.hitbox.bottom = sprite.hitbox.top
+                    if self.direction.y < 0:
+                        self.hitbox.top = sprite.hitbox.bottom
+                    self.rect.centery = self.hitbox.centery
+
     def move(self, dt):
         self.rect.x += self.direction.x * self.speed * dt
+        self.hitbox.centerx = self.rect.centerx
+        self.collisions('horizontal')
+
         self.rect.y += self.direction.y * self.speed * dt
+        self.hitbox.centery = self.rect.centery
+        self.collisions('vertical')
 
     def cooldown(self):
         current_time = pygame.time.get_ticks()

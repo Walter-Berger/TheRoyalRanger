@@ -18,16 +18,22 @@ class Game:
         self.collision_sprites = pygame.sprite.Group()
                 
         # map setup
-        self.setup_map()
+        self.setup_map()     
     
     def setup_map(self):
         map_data = load_pygame('data/maps/world_map.tmx')
         for x,y, image in map_data.get_layer_by_name('Ground').tiles():
             Sprites((x*TILESIZE, y*TILESIZE), image, self.all_sprites)
 
+        for obj in map_data.get_layer_by_name('Objects'):
+            if obj.name == 'Grass':
+                Sprites((obj.x,obj.y), obj.image, self.all_sprites)
+            else:
+                self.objects = CollidableSprites((obj.x,obj.y), obj.image, (self.all_sprites, self.collision_sprites))
+
         for obj in map_data.get_layer_by_name('Entities'):
             if obj.name == 'Player':
-                self.player = Player((obj.x,obj.y), (self.all_sprites, self.collision_sprites))
+                self.player = Player((obj.x,obj.y), self.all_sprites, self.collision_sprites)
 
     def run(self):
         while True:  
