@@ -4,6 +4,7 @@ from player import *
 from debug import *
 from pytmx.util_pygame import load_pygame
 from sprites import *
+from camera import *
 
 class Game:
     def __init__(self):
@@ -14,7 +15,7 @@ class Game:
         self.clock = pygame.time.Clock()
 
         # groups
-        self.all_sprites = pygame.sprite.Group()
+        self.all_sprites = YSortCameraGroup()
         self.collision_sprites = pygame.sprite.Group()
                 
         # map setup
@@ -26,10 +27,10 @@ class Game:
             Sprites((x*TILESIZE, y*TILESIZE), image, self.all_sprites)
 
         for obj in map_data.get_layer_by_name('Objects'):
-            if obj.name == 'Grass':
-                Sprites((obj.x,obj.y), obj.image, self.all_sprites)
-            else:
-                self.objects = CollidableSprites((obj.x,obj.y), obj.image, (self.all_sprites, self.collision_sprites))
+            Sprites((obj.x,obj.y), obj.image, self.all_sprites)
+
+        for obj in map_data.get_layer_by_name('CollidableObjects'):
+            CollidableSprites((obj.x,obj.y), obj.image, (self.all_sprites, self.collision_sprites))
 
         for obj in map_data.get_layer_by_name('Entities'):
             if obj.name == 'Player':
@@ -51,7 +52,7 @@ class Game:
 
             # draw
             self.display_surface.fill('black')
-            self.all_sprites.draw(self.display_surface)
+            self.all_sprites.y_sort_draw(self.player)
             pygame.display.update()
 
 
